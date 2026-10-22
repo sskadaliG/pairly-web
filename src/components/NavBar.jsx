@@ -53,6 +53,11 @@ const NavBar = () => {
                 </Link>
               </li>
               <li>
+                <Link to="/profile/password" onClick={closeDropdown}>
+                  Edit Password
+                </Link>
+              </li>
+              <li>
                 <button onClick={handleLogout}>Logout</button>
               </li>
             </ul>

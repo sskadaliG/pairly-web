@@ -5,6 +5,7 @@ import Body from "./components/Body";
 import Feed from "./components/Feed";
 import Login from "./components/Login";
 import Profile from "./components/Profile";
+import EditPassword from "./components/EditPassword";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
             <Route index element={<Feed />}></Route>
             <Route path="/login" element={<Login />}></Route>
             <Route path="/profile" element={<Profile />}></Route>
+            <Route path="/profile/password" element={<EditPassword />}></Route>
           </Route>
         </Routes>
       </BrowserRouter>
