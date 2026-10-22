@@ -1,13 +1,15 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import UserCard from "./UserCard";
-import { addFeed } from "../utils/feedSlice";
+import { addFeed, removeUserFromFeed } from "../utils/feedSlice";
 import { BASE_URL } from "../utils/constants";
 
 const Feed = () => {
   const dispatch = useDispatch();
   const feed = useSelector((store) => store.feed);
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     // Feed already loaded, no need to fetch again
@@ -27,6 +29,29 @@ const Feed = () => {
     fetchFeed();
   }, [feed, dispatch]);
 
+  // status is "interested" or "not_interested"
+  const handleSendRequest = async (status, userId) => {
+    setSending(true);
+    setError("");
+    try {
+      await axios.post(
+        BASE_URL + "/request/send/" + status + "/" + userId,
+        {},
+        { withCredentials: true }
+      );
+      dispatch(removeUserFromFeed(userId));
+    } catch (err) {
+      // 400 (request already exists) or 404 (user gone): skip this card anyway
+      if (err.response?.status === 400 || err.response?.status === 404) {
+        dispatch(removeUserFromFeed(userId));
+      } else {
+        setError(err.response?.data?.message || err.message);
+      }
+    } finally {
+      setSending(false);
+    }
+  };
+
   if (!feed) {
     return (
       <div className="flex flex-1 items-center justify-center">
@@ -44,11 +69,28 @@ const Feed = () => {
   }
 
   return (
-    <div className="flex flex-1 items-center justify-center p-4">
+    <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4">
       <UserCard user={feed[0]}>
-        <button className="btn btn-outline">Ignore</button>
-        <button className="btn bg-blue-400 hover:bg-blue-500">Interested</button>
+        <button
+          className="btn btn-outline"
+          disabled={sending}
+          onClick={() => handleSendRequest("not_interested", feed[0]._id)}
+        >
+          Ignore
+        </button>
+        <button
+          className="btn bg-blue-400 hover:bg-blue-500"
+          disabled={sending}
+          onClick={() => handleSendRequest("interested", feed[0]._id)}
+        >
+          Interested
+        </button>
       </UserCard>
+      {error && (
+        <div role="alert" className="alert alert-error">
+          <span>{error}</span>
+        </div>
+      )}
     </div>
   );
 };
