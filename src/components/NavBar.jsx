@@ -4,6 +4,7 @@ import axios from "axios";
 import { removeUser } from "../utils/userSlice";
 import { removeFeed } from "../utils/feedSlice";
 import { BASE_URL } from "../utils/constants";
+import { hasPhoto, getInitial } from "../utils/photo";
 
 // daisyUI dropdowns stay open while focused, so blur to close after a click
 const closeDropdown = () => document.activeElement?.blur();
@@ -28,7 +29,9 @@ const NavBar = () => {
   return (
     <div className="navbar bg-blue-300 shadow-sm">
       <div className="flex-1">
-        <a className="btn btn-ghost text-xl ml-1">Pairly</a>
+        <a className="btn btn-ghost text-xl ml-1">
+          <Link to="/">Pairly</Link>
+        </a>
       </div>
       {user && (
         <div className="mr-4 flex items-center gap-3">
@@ -37,11 +40,20 @@ const NavBar = () => {
             <div
               tabIndex={0}
               role="button"
-              className="btn btn-ghost btn-circle avatar"
+              className={
+                "btn btn-ghost btn-circle avatar" +
+                (hasPhoto(user.photoURL) ? "" : " avatar-placeholder")
+              }
             >
-              <div className="w-10 rounded-full">
-                <img alt="User photo" src={user.photoURL} />
-              </div>
+              {hasPhoto(user.photoURL) ? (
+                <div className="w-10 rounded-full">
+                  <img alt="User photo" src={user.photoURL} />
+                </div>
+              ) : (
+                <div className="w-10 rounded-full bg-blue-600 text-white">
+                  <span className="text-lg">{getInitial(user.firstName)}</span>
+                </div>
+              )}
             </div>
             <ul
               tabIndex={-1}
