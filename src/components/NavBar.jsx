@@ -9,9 +9,12 @@ const NavBar = () => {
         <a className="btn btn-ghost text-xl ml-1">Pairly</a>
       </div>
       {user && (
-        <div className="avatar mr-4">
-          <div className="w-10 rounded-full">
-            <img alt="User photo" src={user.photoURL} />
+        <div className="mr-4 flex items-center gap-3">
+          <p>Welcome, {user.firstName}</p>
+          <div className="avatar">
+            <div className="w-10 rounded-full">
+              <img alt="User photo" src={user.photoURL} />
+            </div>
           </div>
         </div>
       )}
