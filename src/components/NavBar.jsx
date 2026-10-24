@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { removeUser } from "../utils/userSlice";
 import { removeFeed } from "../utils/feedSlice";
+import { removeRequests } from "../utils/requestsSlice";
 import { BASE_URL } from "../utils/constants";
 import { hasPhoto, getInitial } from "../utils/photo";
 
@@ -20,6 +21,7 @@ const NavBar = () => {
       await axios.post(BASE_URL + "/logout", {}, { withCredentials: true });
       dispatch(removeUser());
       dispatch(removeFeed());
+      dispatch(removeRequests());
       navigate("/login");
     } catch (err) {
       console.log("error", err);
@@ -67,6 +69,11 @@ const NavBar = () => {
               <li>
                 <Link to="/profile/password" onClick={closeDropdown}>
                   Edit Password
+                </Link>
+              </li>
+              <li>
+                <Link to="/requests" onClick={closeDropdown}>
+                  Requests
                 </Link>
               </li>
               <li>
