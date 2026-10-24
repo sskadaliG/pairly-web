@@ -7,6 +7,7 @@ import Login from "./components/Login";
 import Profile from "./components/Profile";
 import EditPassword from "./components/EditPassword";
 import Requests from "./components/Requests";
+import Connections from "./components/Connections";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
             <Route path="/profile" element={<Profile />}></Route>
             <Route path="/profile/password" element={<EditPassword />}></Route>
             <Route path="/requests" element={<Requests />}></Route>
+            <Route path="/connections" element={<Connections />}></Route>
           </Route>
         </Routes>
       </BrowserRouter>

@@ -4,6 +4,7 @@ import axios from "axios";
 import { removeUser } from "../utils/userSlice";
 import { removeFeed } from "../utils/feedSlice";
 import { removeRequests } from "../utils/requestsSlice";
+import { removeConnections } from "../utils/connectionsSlice";
 import { BASE_URL } from "../utils/constants";
 import { hasPhoto, getInitial } from "../utils/photo";
 
@@ -22,6 +23,7 @@ const NavBar = () => {
       dispatch(removeUser());
       dispatch(removeFeed());
       dispatch(removeRequests());
+      dispatch(removeConnections());
       navigate("/login");
     } catch (err) {
       console.log("error", err);
@@ -69,6 +71,11 @@ const NavBar = () => {
               <li>
                 <Link to="/profile/password" onClick={closeDropdown}>
                   Edit Password
+                </Link>
+              </li>
+              <li>
+                <Link to="/connections" onClick={closeDropdown}>
+                  Connections
                 </Link>
               </li>
               <li>
