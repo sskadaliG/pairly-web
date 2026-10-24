@@ -7,7 +7,7 @@ const Body = () => {
   useFetchUser();
 
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="flex min-h-screen flex-col bg-base-200">
       <NavBar />
       <main className="flex flex-1 flex-col">
         <Outlet />

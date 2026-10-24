@@ -86,7 +86,7 @@ const EditPassword = () => {
 
           <div className="card-actions mt-4">
             <button
-              className="btn w-full bg-blue-400 hover:bg-blue-500"
+              className="btn btn-primary w-full"
               onClick={savePassword}
             >
               Update password

@@ -90,7 +90,7 @@ const Requests = () => {
                 Reject
               </button>
               <button
-                className="btn bg-blue-400 hover:bg-blue-500"
+                className="btn btn-primary"
                 disabled={reviewingId === request._id}
                 onClick={() => reviewRequest("accepted", request._id)}
               >

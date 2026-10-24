@@ -1,4 +1,44 @@
 @import "tailwindcss";
 @plugin "daisyui" {
-  themes: light --default;
+  themes: false;
+}
+
+/* Pairly's own theme: rose and violet brand colors on soft, warm backgrounds */
+@plugin "daisyui/theme" {
+  name: "pairly";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  --color-base-100: oklch(100% 0 0);
+  --color-base-200: oklch(97.5% 0.008 350);
+  --color-base-300: oklch(93% 0.014 350);
+  --color-base-content: oklch(25% 0.03 285);
+
+  --color-primary: oklch(64% 0.21 12);
+  --color-primary-content: oklch(99% 0 0);
+  --color-secondary: oklch(56% 0.22 293);
+  --color-secondary-content: oklch(99% 0 0);
+  --color-accent: oklch(80% 0.15 70);
+  --color-accent-content: oklch(25% 0.05 70);
+  --color-neutral: oklch(24% 0.03 285);
+  --color-neutral-content: oklch(96% 0.01 285);
+
+  --color-info: oklch(70% 0.14 230);
+  --color-info-content: oklch(20% 0.05 230);
+  --color-success: oklch(70% 0.15 155);
+  --color-success-content: oklch(20% 0.05 155);
+  --color-warning: oklch(80% 0.16 80);
+  --color-warning-content: oklch(25% 0.05 80);
+  --color-error: oklch(62% 0.22 25);
+  --color-error-content: oklch(99% 0 0);
+
+  --radius-selector: 1rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
 }

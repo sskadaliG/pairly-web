@@ -79,7 +79,7 @@ const Feed = () => {
           Ignore
         </button>
         <button
-          className="btn bg-blue-400 hover:bg-blue-500"
+          className="btn btn-primary"
           disabled={sending}
           onClick={() => handleSendRequest("interested", feed[0]._id)}
         >

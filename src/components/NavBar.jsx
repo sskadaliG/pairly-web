@@ -31,9 +31,12 @@ const NavBar = () => {
   };
 
   return (
-    <div className="navbar bg-blue-300 shadow-sm">
+    <div className="navbar bg-linear-to-r from-primary to-secondary text-primary-content shadow-md">
       <div className="flex-1">
-        <Link to="/" className="btn btn-ghost text-xl ml-1">
+        <Link
+          to="/"
+          className="btn btn-ghost ml-1 text-2xl font-bold tracking-tight text-primary-content"
+        >
           Pairly
         </Link>
       </div>
@@ -54,14 +57,14 @@ const NavBar = () => {
                   <img alt="User photo" src={user.photoURL} />
                 </div>
               ) : (
-                <div className="w-10 rounded-full bg-blue-600 text-white">
+                <div className="w-10 rounded-full bg-base-100 text-primary">
                   <span className="text-lg">{getInitial(user.firstName)}</span>
                 </div>
               )}
             </div>
             <ul
               tabIndex={-1}
-              className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+              className="menu menu-sm dropdown-content bg-base-100 text-base-content rounded-box z-1 mt-3 w-52 p-2 shadow"
             >
               <li>
                 <Link to="/profile" onClick={closeDropdown}>

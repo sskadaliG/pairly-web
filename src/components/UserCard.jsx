@@ -13,7 +13,7 @@ const UserCard = ({ user, children }) => {
             alt={firstName + " " + lastName}
           />
         ) : (
-          <div className="flex h-80 w-full items-center justify-center bg-blue-200 text-9xl font-semibold text-blue-700">
+          <div className="flex h-80 w-full items-center justify-center bg-linear-to-br from-primary to-secondary text-9xl font-semibold text-primary-content">
             {getInitial(firstName)}
           </div>
         )}

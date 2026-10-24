@@ -108,7 +108,7 @@ const Login = () => {
           <div className="card-actions mt-4">
             <button
               type="submit"
-              className="btn w-full bg-blue-400 hover:bg-blue-500"
+              className="btn btn-primary w-full"
               disabled={loading}
             >
               {loading && <span className="loading loading-spinner"></span>}
