@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { addUser } from "../utils/userSlice";
 import { BASE_URL } from "../utils/constants";
 
@@ -115,6 +115,13 @@ const Login = () => {
               Login
             </button>
           </div>
+
+          <p className="mt-4 text-center text-sm">
+            New here?{" "}
+            <Link to="/signup" className="link link-primary">
+              Sign up
+            </Link>
+          </p>
         </form>
       </div>
     </div>

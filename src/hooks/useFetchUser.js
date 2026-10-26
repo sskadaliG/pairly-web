@@ -1,13 +1,17 @@
 import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import { addUser } from "../utils/userSlice";
 import { BASE_URL } from "../utils/constants";
 
+// Pages that logged-out users are allowed to see
+const PUBLIC_PATHS = ["/login", "/signup"];
+
 const useFetchUser = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const user = useSelector((store) => store.user);
 
   useEffect(() => {
@@ -23,7 +27,9 @@ const useFetchUser = () => {
       } catch (err) {
         // 401: no token or expired token, 404: user no longer exists
         if (err.response?.status === 401 || err.response?.status === 404) {
-          navigate("/login");
+          if (!PUBLIC_PATHS.includes(pathname)) {
+            navigate("/login");
+          }
         } else {
           console.log("error", err);
         }
@@ -31,7 +37,7 @@ const useFetchUser = () => {
     };
 
     fetchUser();
-  }, [user, dispatch, navigate]);
+  }, [user, pathname, dispatch, navigate]);
 };
 
 export default useFetchUser;
