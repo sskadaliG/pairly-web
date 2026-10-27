@@ -1,11 +1,84 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 const Signup = () => {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleSignup = (e) => {
+    // Stop the browser from reloading the page on submit
+    e.preventDefault();
+  };
+
   return (
     <div className="flex flex-1 items-center justify-center p-4">
       <div className="card w-full max-w-sm bg-base-100 shadow-md">
-        <div className="card-body">
+        <form className="card-body" onSubmit={handleSignup} noValidate>
           <h2 className="card-title justify-center text-2xl">Sign up</h2>
+
+          <fieldset className="fieldset">
+            <label className="label" htmlFor="firstName">
+              First name
+            </label>
+            <input
+              id="firstName"
+              type="text"
+              className="input w-full"
+              placeholder="First name"
+              autoComplete="given-name"
+              maxLength={20}
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+
+            <label className="label mt-2" htmlFor="lastName">
+              Last name
+            </label>
+            <input
+              id="lastName"
+              type="text"
+              className="input w-full"
+              placeholder="Last name"
+              autoComplete="family-name"
+              maxLength={10}
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+
+            <label className="label mt-2" htmlFor="email">
+              Email
+            </label>
+            <input
+              id="email"
+              type="email"
+              className="input w-full"
+              placeholder="you@example.com"
+              autoComplete="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+
+            <label className="label mt-2" htmlFor="password">
+              Password
+            </label>
+            <input
+              id="password"
+              type="password"
+              className="input w-full"
+              placeholder="Password"
+              autoComplete="new-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+          </fieldset>
+
+          <div className="card-actions mt-4">
+            <button type="submit" className="btn btn-primary w-full">
+              Sign up
+            </button>
+          </div>
 
           <p className="mt-4 text-center text-sm">
             Already have an account?{" "}
@@ -13,7 +86,7 @@ const Signup = () => {
               Login
             </Link>
           </p>
-        </div>
+        </form>
       </div>
     </div>
   );
