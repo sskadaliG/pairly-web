@@ -30,6 +30,7 @@ const Feed = () => {
   }, [feed, dispatch]);
 
   // status is "interested" or "not_interested"
+  // Returns true if the card was removed from the feed
   const handleSendRequest = async (status, userId) => {
     setSending(true);
     setError("");
@@ -40,13 +41,15 @@ const Feed = () => {
         { withCredentials: true },
       );
       dispatch(removeUserFromFeed(userId));
+      return true;
     } catch (err) {
       // 400 (request already exists) or 404 (user gone): skip this card anyway
       if (err.response?.status === 400 || err.response?.status === 404) {
         dispatch(removeUserFromFeed(userId));
-      } else {
-        setError(err.response?.data?.message || err.message);
+        return true;
       }
+      setError(err.response?.data?.message || err.message);
+      return false;
     } finally {
       setSending(false);
     }
@@ -69,9 +72,14 @@ const Feed = () => {
   }
 
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4">
+    // overflow-hidden: no sideways scrollbar while a card flies off the screen
+    <div className="flex flex-1 flex-col items-center justify-center gap-4 overflow-hidden p-4">
       {/* key: a new person gets a fresh card, back in the middle */}
-      <SwipeCard key={feed[0]._id} user={feed[0]}>
+      <SwipeCard
+        key={feed[0]._id}
+        user={feed[0]}
+        onSwipe={(status) => handleSendRequest(status, feed[0]._id)}
+      >
         <button
           className="btn btn-outline"
           disabled={sending}
