@@ -1,5 +1,7 @@
+import axios from "axios";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { BASE_URL } from "../utils/constants";
 import { validateSignup } from "../utils/validation";
 
 const Signup = () => {
@@ -9,16 +11,44 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   // Only show field errors after the first signup attempt
   const [submitted, setSubmitted] = useState(false);
+  const [serverError, setServerError] = useState("");
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const fields = { firstName, lastName, email, password };
   const errors = submitted ? validateSignup(fields) : {};
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     // Stop the browser from reloading the page on submit
     e.preventDefault();
     setSubmitted(true);
+    setServerError("");
+    setSuccess(false);
 
     if (Object.keys(validateSignup(fields)).length > 0) return;
+
+    setLoading(true);
+    try {
+      await axios.post(
+        BASE_URL + "/signup",
+        {
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          email: email.trim(),
+          password,
+        },
+        { withCredentials: true }
+      );
+      setSuccess(true);
+    } catch (err) {
+      console.log("error", err);
+      const data = err.response?.data;
+      setServerError(
+        (typeof data === "string" ? data : data?.message) || err.message
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -95,8 +125,25 @@ const Signup = () => {
             {errors.password && <p className="text-error">{errors.password}</p>}
           </fieldset>
 
+          {serverError && (
+            <div role="alert" className="alert alert-error alert-soft mt-2">
+              <span>{serverError}</span>
+            </div>
+          )}
+
+          {success && (
+            <div role="alert" className="alert alert-success alert-soft mt-2">
+              <span>Account created!</span>
+            </div>
+          )}
+
           <div className="card-actions mt-4">
-            <button type="submit" className="btn btn-primary w-full">
+            <button
+              type="submit"
+              className="btn btn-primary w-full"
+              disabled={loading}
+            >
+              {loading && <span className="loading loading-spinner"></span>}
               Sign up
             </button>
           </div>
