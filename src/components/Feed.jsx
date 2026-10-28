@@ -8,7 +8,6 @@ import { BASE_URL } from "../utils/constants";
 const Feed = () => {
   const dispatch = useDispatch();
   const feed = useSelector((store) => store.feed);
-  const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -32,7 +31,6 @@ const Feed = () => {
   // status is "interested" or "not_interested"
   // Returns true if the card was removed from the feed
   const handleSendRequest = async (status, userId) => {
-    setSending(true);
     setError("");
     try {
       await axios.post(
@@ -50,8 +48,6 @@ const Feed = () => {
       }
       setError(err.response?.data?.message || err.message);
       return false;
-    } finally {
-      setSending(false);
     }
   };
 
@@ -79,22 +75,7 @@ const Feed = () => {
         key={feed[0]._id}
         user={feed[0]}
         onSwipe={(status) => handleSendRequest(status, feed[0]._id)}
-      >
-        <button
-          className="btn btn-outline"
-          disabled={sending}
-          onClick={() => handleSendRequest("not_interested", feed[0]._id)}
-        >
-          Ignore
-        </button>
-        <button
-          className="btn btn-primary"
-          disabled={sending}
-          onClick={() => handleSendRequest("interested", feed[0]._id)}
-        >
-          Interested
-        </button>
-      </SwipeCard>
+      />
       {error && (
         <div role="alert" className="alert alert-error">
           <span>{error}</span>

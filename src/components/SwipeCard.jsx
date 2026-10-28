@@ -10,7 +10,7 @@ const SWIPE_THRESHOLD = 100;
 const SWIPE_VELOCITY = 500;
 
 // onSwipe(status) sends the request and returns true if the card can be removed
-const SwipeCard = ({ user, onSwipe, children }) => {
+const SwipeCard = ({ user, onSwipe }) => {
   // True while the card flies away and the request is sent, so it can't be dragged again
   const [leaving, setLeaving] = useState(false);
   // x follows the drag: 0 is the middle, negative is left, positive is right
@@ -23,19 +23,9 @@ const SwipeCard = ({ user, onSwipe, children }) => {
   const interestedOpacity = useTransform(x, [20, SWIPE_DISTANCE], [0, 1]);
   const nopeOpacity = useTransform(x, [-SWIPE_DISTANCE, -20], [1, 0]);
 
-  const handleDragEnd = async (event, info) => {
-    const { offset, velocity } = info;
-
-    let direction = 0; // 1 = right, -1 = left, 0 = not far or fast enough
-    if (offset.x > SWIPE_THRESHOLD || velocity.x > SWIPE_VELOCITY) {
-      direction = 1;
-    } else if (offset.x < -SWIPE_THRESHOLD || velocity.x < -SWIPE_VELOCITY) {
-      direction = -1;
-    }
-
-    // Not far enough: dragConstraints already springs the card back
-    if (direction === 0) return;
-
+  // direction: 1 = right (interested), -1 = left (not interested)
+  // Used by both dragging and the buttons, so they look the same
+  const swipe = async (direction) => {
     setLeaving(true);
     // Fly off the screen on the side it was swiped to
     await animate(x, direction * window.innerWidth, { duration: 0.3 });
@@ -49,6 +39,17 @@ const SwipeCard = ({ user, onSwipe, children }) => {
       animate(x, 0);
       setLeaving(false);
     }
+  };
+
+  const handleDragEnd = (event, info) => {
+    const { offset, velocity } = info;
+
+    if (offset.x > SWIPE_THRESHOLD || velocity.x > SWIPE_VELOCITY) {
+      swipe(1);
+    } else if (offset.x < -SWIPE_THRESHOLD || velocity.x < -SWIPE_VELOCITY) {
+      swipe(-1);
+    }
+    // Otherwise it wasn't far or fast enough: dragConstraints springs it back
   };
 
   return (
@@ -73,7 +74,22 @@ const SwipeCard = ({ user, onSwipe, children }) => {
         NOPE
       </motion.div>
 
-      <UserCard user={user}>{children}</UserCard>
+      <UserCard user={user}>
+        <button
+          className="btn btn-outline"
+          disabled={leaving}
+          onClick={() => swipe(-1)}
+        >
+          Ignore
+        </button>
+        <button
+          className="btn btn-primary"
+          disabled={leaving}
+          onClick={() => swipe(1)}
+        >
+          Interested
+        </button>
+      </UserCard>
     </motion.div>
   );
 };
