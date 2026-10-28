@@ -9,13 +9,14 @@ const Signup = () => {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [gender, setGender] = useState("");
   // Only show field errors after the first signup attempt
   const [submitted, setSubmitted] = useState(false);
   const [serverError, setServerError] = useState("");
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const fields = { firstName, lastName, email, password };
+  const fields = { firstName, lastName, email, password, gender };
   const errors = submitted ? validateSignup(fields) : {};
 
   const handleSignup = async (e) => {
@@ -27,24 +28,23 @@ const Signup = () => {
 
     if (Object.keys(validateSignup(fields)).length > 0) return;
 
+    const body = {
+      firstName: firstName.trim(),
+      lastName: lastName.trim(),
+      email: email.trim(),
+      password,
+      gender,
+    };
+
     setLoading(true);
     try {
-      await axios.post(
-        BASE_URL + "/signup",
-        {
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          email: email.trim(),
-          password,
-        },
-        { withCredentials: true }
-      );
+      await axios.post(BASE_URL + "/signup", body, { withCredentials: true });
       setSuccess(true);
     } catch (err) {
       console.log("error", err);
       const data = err.response?.data;
       setServerError(
-        (typeof data === "string" ? data : data?.message) || err.message
+        (typeof data === "string" ? data : data?.message) || err.message,
       );
     } finally {
       setLoading(false);
@@ -57,9 +57,13 @@ const Signup = () => {
         <form className="card-body" onSubmit={handleSignup} noValidate>
           <h2 className="card-title justify-center text-2xl">Sign up</h2>
 
+          <p className="text-center text-sm text-base-content/60">
+            Fields marked <span className="text-error">*</span> are required
+          </p>
+
           <fieldset className="fieldset">
             <label className="label" htmlFor="firstName">
-              First name
+              First name <span className="text-error">*</span>
             </label>
             <input
               id="firstName"
@@ -78,7 +82,7 @@ const Signup = () => {
             )}
 
             <label className="label mt-2" htmlFor="lastName">
-              Last name
+              Last name <span className="text-error">*</span>
             </label>
             <input
               id="lastName"
@@ -95,7 +99,7 @@ const Signup = () => {
             {errors.lastName && <p className="text-error">{errors.lastName}</p>}
 
             <label className="label mt-2" htmlFor="email">
-              Email
+              Email <span className="text-error">*</span>
             </label>
             <input
               id="email"
@@ -109,7 +113,7 @@ const Signup = () => {
             {errors.email && <p className="text-error">{errors.email}</p>}
 
             <label className="label mt-2" htmlFor="password">
-              Password
+              Password <span className="text-error">*</span>
             </label>
             <input
               id="password"
@@ -123,6 +127,26 @@ const Signup = () => {
               onChange={(e) => setPassword(e.target.value)}
             />
             {errors.password && <p className="text-error">{errors.password}</p>}
+
+            <label className="label mt-2" htmlFor="gender">
+              Gender <span className="text-error">*</span>
+            </label>
+            <select
+              id="gender"
+              className={
+                "select w-full" + (errors.gender ? " select-error" : "")
+              }
+              value={gender}
+              onChange={(e) => setGender(e.target.value)}
+            >
+              <option value="" disabled>
+                Select gender
+              </option>
+              <option value="Male">Male</option>
+              <option value="Female">Female</option>
+              <option value="Other">Other</option>
+            </select>
+            {errors.gender && <p className="text-error">{errors.gender}</p>}
           </fieldset>
 
           {serverError && (

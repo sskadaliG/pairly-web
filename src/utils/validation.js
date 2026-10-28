@@ -22,7 +22,13 @@ export const validateLogin = ({ email, password }) => {
 };
 
 // Same rules as the backend's validateSignUpData
-export const validateSignup = ({ firstName, lastName, email, password }) => {
+export const validateSignup = ({
+  firstName,
+  lastName,
+  email,
+  password,
+  gender,
+}) => {
   const errors = {};
 
   if (!firstName.trim()) {
@@ -49,6 +55,10 @@ export const validateSignup = ({ firstName, lastName, email, password }) => {
   ) {
     errors.password =
       "Use 8+ characters with an uppercase letter, a lowercase letter, a number and a symbol.";
+  }
+
+  if (!gender) {
+    errors.gender = "Please select your gender.";
   }
 
   return errors;
