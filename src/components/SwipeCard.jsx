@@ -54,8 +54,11 @@ const SwipeCard = ({ user, onSwipe }) => {
 
   return (
     <motion.div
-      className="relative cursor-grab active:cursor-grabbing"
+      className="relative col-start-1 row-start-1 flex cursor-grab active:cursor-grabbing"
       style={{ x, rotate }}
+      // Grow from the size of the card underneath, so the stack moves forward smoothly
+      initial={{ scale: 0.95, opacity: 0.7 }}
+      animate={{ scale: 1, opacity: 1 }}
       drag={leaving ? false : "x"}
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={1}

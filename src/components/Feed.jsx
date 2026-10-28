@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 import SwipeCard from "./SwipeCard";
+import UserCard from "./UserCard";
 import { addFeed, removeUserFromFeed } from "../utils/feedSlice";
 import { BASE_URL } from "../utils/constants";
 
@@ -70,12 +71,26 @@ const Feed = () => {
   return (
     // overflow-hidden: no sideways scrollbar while a card flies off the screen
     <div className="flex flex-1 flex-col items-center justify-center gap-4 overflow-hidden p-4">
-      {/* key: a new person gets a fresh card, back in the middle */}
-      <SwipeCard
-        key={feed[0]._id}
-        user={feed[0]}
-        onSwipe={(status) => handleSendRequest(status, feed[0]._id)}
-      />
+      {/* Both cards sit in the same grid cell, so they stack on top of each other */}
+      <div className="grid">
+        {/* Next person, waiting underneath: slightly smaller and not clickable */}
+        {feed[1] && (
+          <div
+            key={feed[1]._id}
+            className="pointer-events-none col-start-1 row-start-1 flex scale-95 opacity-70"
+            aria-hidden="true"
+          >
+            <UserCard user={feed[1]} />
+          </div>
+        )}
+
+        {/* key: a new person gets a fresh card, back in the middle */}
+        <SwipeCard
+          key={feed[0]._id}
+          user={feed[0]}
+          onSwipe={(status) => handleSendRequest(status, feed[0]._id)}
+        />
+      </div>
       {error && (
         <div role="alert" className="alert alert-error">
           <span>{error}</span>
