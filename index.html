@@ -5,6 +5,21 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>pairly-web</title>
+    <script>
+      // Set the theme before the page draws, so dark mode doesn't flash white
+      (function () {
+        var theme;
+        try {
+          theme = localStorage.getItem("theme");
+        } catch (e) {}
+        if (theme !== "pairly" && theme !== "pairly-dark") {
+          theme = window.matchMedia("(prefers-color-scheme: dark)").matches
+            ? "pairly-dark"
+            : "pairly";
+        }
+        document.documentElement.setAttribute("data-theme", theme);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

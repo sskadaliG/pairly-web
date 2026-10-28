@@ -42,3 +42,43 @@
   --depth: 1;
   --noise: 0;
 }
+
+/* Dark version of the Pairly theme: same brand colors on deep violet-gray backgrounds */
+@plugin "daisyui/theme" {
+  name: "pairly-dark";
+  default: false;
+  prefersdark: true;
+  color-scheme: dark;
+
+  --color-base-100: oklch(25% 0.025 285);
+  --color-base-200: oklch(20% 0.022 285);
+  --color-base-300: oklch(17% 0.02 285);
+  --color-base-content: oklch(93% 0.012 285);
+
+  --color-primary: oklch(68% 0.2 12);
+  --color-primary-content: oklch(99% 0 0);
+  --color-secondary: oklch(60% 0.2 293);
+  --color-secondary-content: oklch(99% 0 0);
+  --color-accent: oklch(80% 0.15 70);
+  --color-accent-content: oklch(25% 0.05 70);
+  --color-neutral: oklch(14% 0.02 285);
+  --color-neutral-content: oklch(90% 0.01 285);
+
+  --color-info: oklch(72% 0.13 230);
+  --color-info-content: oklch(20% 0.05 230);
+  --color-success: oklch(72% 0.15 155);
+  --color-success-content: oklch(20% 0.05 155);
+  --color-warning: oklch(80% 0.16 80);
+  --color-warning-content: oklch(25% 0.05 80);
+  --color-error: oklch(66% 0.21 25);
+  --color-error-content: oklch(99% 0 0);
+
+  --radius-selector: 1rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
+}
