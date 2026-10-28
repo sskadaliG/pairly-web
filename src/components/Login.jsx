@@ -4,21 +4,7 @@ import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { addUser } from "../utils/userSlice";
 import { BASE_URL } from "../utils/constants";
-
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-const validate = (email, password) => {
-  const errors = {};
-  if (!email.trim()) {
-    errors.email = "Email is required.";
-  } else if (!EMAIL_PATTERN.test(email.trim())) {
-    errors.email = "Enter a valid email, like you@example.com.";
-  }
-  if (!password) {
-    errors.password = "Password is required.";
-  }
-  return errors;
-};
+import { validateLogin } from "../utils/validation";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -30,14 +16,14 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const errors = submitted ? validate(email, password) : {};
+  const errors = submitted ? validateLogin({ email, password }) : {};
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setSubmitted(true);
     setServerError("");
 
-    if (Object.keys(validate(email, password)).length > 0) return;
+    if (Object.keys(validateLogin({ email, password })).length > 0) return;
 
     setLoading(true);
     try {
