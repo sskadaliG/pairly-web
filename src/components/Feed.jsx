@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
+import { motion } from "motion/react";
 import UserCard from "./UserCard";
 import { addFeed, removeUserFromFeed } from "../utils/feedSlice";
 import { BASE_URL } from "../utils/constants";
@@ -37,7 +38,7 @@ const Feed = () => {
       await axios.post(
         BASE_URL + "/request/send/" + status + "/" + userId,
         {},
-        { withCredentials: true }
+        { withCredentials: true },
       );
       dispatch(removeUserFromFeed(userId));
     } catch (err) {
@@ -70,22 +71,31 @@ const Feed = () => {
 
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-4 p-4">
-      <UserCard user={feed[0]}>
-        <button
-          className="btn btn-outline"
-          disabled={sending}
-          onClick={() => handleSendRequest("not_interested", feed[0]._id)}
-        >
-          Ignore
-        </button>
-        <button
-          className="btn btn-primary"
-          disabled={sending}
-          onClick={() => handleSendRequest("interested", feed[0]._id)}
-        >
-          Interested
-        </button>
-      </UserCard>
+      {/* key: a new person gets a fresh draggable card, back in the middle */}
+      <motion.div
+        key={feed[0]._id}
+        className="cursor-grab active:cursor-grabbing"
+        drag="x"
+        dragConstraints={{ left: 0, right: 0 }}
+        dragElastic={1}
+      >
+        <UserCard user={feed[0]}>
+          <button
+            className="btn btn-outline"
+            disabled={sending}
+            onClick={() => handleSendRequest("not_interested", feed[0]._id)}
+          >
+            Ignore
+          </button>
+          <button
+            className="btn btn-primary"
+            disabled={sending}
+            onClick={() => handleSendRequest("interested", feed[0]._id)}
+          >
+            Interested
+          </button>
+        </UserCard>
+      </motion.div>
       {error && (
         <div role="alert" className="alert alert-error">
           <span>{error}</span>

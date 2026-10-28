@@ -11,6 +11,8 @@ const UserCard = ({ user, children }) => {
             className="h-80 w-full object-cover"
             src={photoURL}
             alt={firstName + " " + lastName}
+            // Stop the browser's own image dragging, so the card can be swiped
+            draggable={false}
           />
         ) : (
           <div className="flex h-80 w-full items-center justify-center bg-linear-to-br from-primary to-secondary text-9xl font-semibold text-primary-content">
