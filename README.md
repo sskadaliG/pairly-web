@@ -39,8 +39,9 @@ The backend must allow CORS from `http://localhost:5173` with `credentials: true
 
 ## Features
 
+- **Signup** with the required fields (name, email, password, gender) and validation that matches the backend. After signing up, you're logged in automatically and taken to your profile, with a welcome message and a "Skip for now" link to the feed.
 - **Login** with form validation and server error messages.
-- **Stay logged in** after a refresh: the app loads the user from the cookie, or sends you to the login page.
+- **Stay logged in** after a refresh: the app loads the user from the cookie, or sends you to the login page. The login and signup pages are open to logged-out users.
 - **Feed** showing one person at a time, with Ignore and Interested buttons. A new batch loads when the feed runs out.
 - **Connection requests** from people interested in you, with Accept and Reject buttons.
 - **Connections** list of people you've matched with.
@@ -61,18 +62,20 @@ src/
 │   ├── NavBar.jsx            # Logo, welcome message, profile dropdown, logout
 │   ├── Footer.jsx            # Footer kept at the bottom of the page
 │   ├── Login.jsx             # Login form with validation
+│   ├── Signup.jsx            # Signup form, then auto login and go to profile
 │   ├── Feed.jsx              # Home page: feed cards with Ignore / Interested
 │   ├── UserCard.jsx          # Reusable person card; buttons passed as children
 │   ├── Requests.jsx          # Received requests with Accept / Reject
 │   ├── Connections.jsx       # Your connections
-│   ├── Profile.jsx           # Loads the user and renders EditProfile
+│   ├── Profile.jsx           # Loads the user, welcome banner for new users
 │   ├── EditProfile.jsx       # Profile form with live card preview
 │   └── EditPassword.jsx      # Change password form
 ├── hooks/
-│   └── useFetchUser.js       # Restores the logged-in user on page load
+│   └── useFetchUser.js       # Restores the logged-in user; redirects to login except on public pages
 └── utils/
     ├── constants.js          # BASE_URL and the backend's default photo URL
     ├── photo.js              # hasPhoto and getInitial helpers
+    ├── validation.js         # validateLogin and validateSignup
     ├── appStore.js           # Redux store
     ├── userSlice.js          # Logged-in user
     ├── feedSlice.js          # Feed users
@@ -88,6 +91,7 @@ All pages render inside the `Body` layout, so the navbar and footer appear on ev
 | ------------------- | ------------------------ |
 | `/`                 | Home (feed)              |
 | `/login`            | Login                    |
+| `/signup`           | Sign up                  |
 | `/profile`          | Edit profile             |
 | `/profile/password` | Change password          |
 | `/requests`         | Connection requests      |
@@ -97,7 +101,8 @@ All pages render inside the `Body` layout, so the navbar and footer appear on ev
 
 | Method | Endpoint                               | Used for                    |
 | ------ | -------------------------------------- | --------------------------- |
-| POST   | `/login`                               | Log in                      |
+| POST   | `/signup`                              | Create an account           |
+| POST   | `/login`                               | Log in (also after signup)  |
 | POST   | `/logout`                              | Log out                     |
 | GET    | `/profile/view`                        | Load the logged-in user     |
 | PATCH  | `/profile/edit`                        | Save profile                |
@@ -117,7 +122,6 @@ All requests send the auth cookie with `withCredentials: true`.
 
 ## Next steps
 
-- Signup page
 - Chat with connections
 - Dark mode toggle
 - Deployment
