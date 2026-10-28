@@ -1,6 +1,8 @@
 import axios from "axios";
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
+import { addUser } from "../utils/userSlice";
 import { BASE_URL } from "../utils/constants";
 import { validateSignup } from "../utils/validation";
 
@@ -13,8 +15,9 @@ const Signup = () => {
   // Only show field errors after the first signup attempt
   const [submitted, setSubmitted] = useState(false);
   const [serverError, setServerError] = useState("");
-  const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const fields = { firstName, lastName, email, password, gender };
   const errors = submitted ? validateSignup(fields) : {};
@@ -24,7 +27,6 @@ const Signup = () => {
     e.preventDefault();
     setSubmitted(true);
     setServerError("");
-    setSuccess(false);
 
     if (Object.keys(validateSignup(fields)).length > 0) return;
 
@@ -39,13 +41,31 @@ const Signup = () => {
     setLoading(true);
     try {
       await axios.post(BASE_URL + "/signup", body, { withCredentials: true });
-      setSuccess(true);
     } catch (err) {
       console.log("error", err);
       const data = err.response?.data;
       setServerError(
         (typeof data === "string" ? data : data?.message) || err.message,
       );
+      setLoading(false);
+      return;
+    }
+
+    // Signup doesn't log in, so log in with the same email and password
+    // to get the cookie and the user data
+    try {
+      const res = await axios.post(
+        BASE_URL + "/login",
+        { email: body.email, password },
+        { withCredentials: true },
+      );
+      dispatch(addUser(res.data.body));
+      // New users go to their profile first to add a photo, age and bio
+      navigate("/profile", { state: { newUser: true } });
+    } catch (err) {
+      // The account exists, so the user can still log in by hand
+      console.log("error", err);
+      navigate("/login");
     } finally {
       setLoading(false);
     }
@@ -152,12 +172,6 @@ const Signup = () => {
           {serverError && (
             <div role="alert" className="alert alert-error alert-soft mt-2">
               <span>{serverError}</span>
-            </div>
-          )}
-
-          {success && (
-            <div role="alert" className="alert alert-success alert-soft mt-2">
-              <span>Account created!</span>
             </div>
           )}
 
