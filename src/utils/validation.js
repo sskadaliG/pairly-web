@@ -21,6 +21,15 @@ export const validateLogin = ({ email, password }) => {
   return errors;
 };
 
+export const validateForgotPassword = ({ email }) => {
+  const errors = {};
+
+  const emailError = validateEmail(email);
+  if (emailError) errors.email = emailError;
+
+  return errors;
+};
+
 // Same rules as the backend's validateSignUpData
 export const validateSignup = ({
   firstName,
