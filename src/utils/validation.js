@@ -8,6 +8,21 @@ const validateEmail = (email) => {
   return "";
 };
 
+// Same strong password rule as the backend (validator.isStrongPassword)
+const validateNewPassword = (password) => {
+  if (!password) return "Password is required.";
+  if (
+    password.length < 8 ||
+    !/[a-z]/.test(password) ||
+    !/[A-Z]/.test(password) ||
+    !/[0-9]/.test(password) ||
+    !/[^A-Za-z0-9]/.test(password)
+  ) {
+    return "Use 8+ characters with an uppercase letter, a lowercase letter, a number and a symbol.";
+  }
+  return "";
+};
+
 export const validateLogin = ({ email, password }) => {
   const errors = {};
 
@@ -53,21 +68,26 @@ export const validateSignup = ({
   const emailError = validateEmail(email);
   if (emailError) errors.email = emailError;
 
-  if (!password) {
-    errors.password = "Password is required.";
-  } else if (
-    password.length < 8 ||
-    !/[a-z]/.test(password) ||
-    !/[A-Z]/.test(password) ||
-    !/[0-9]/.test(password) ||
-    !/[^A-Za-z0-9]/.test(password)
-  ) {
-    errors.password =
-      "Use 8+ characters with an uppercase letter, a lowercase letter, a number and a symbol.";
-  }
+  const passwordError = validateNewPassword(password);
+  if (passwordError) errors.password = passwordError;
 
   if (!gender) {
     errors.gender = "Please select your gender.";
+  }
+
+  return errors;
+};
+
+export const validateResetPassword = ({ newPassword, confirmPassword }) => {
+  const errors = {};
+
+  const passwordError = validateNewPassword(newPassword);
+  if (passwordError) errors.newPassword = passwordError;
+
+  if (!confirmPassword) {
+    errors.confirmPassword = "Please confirm your new password.";
+  } else if (confirmPassword !== newPassword) {
+    errors.confirmPassword = "Passwords don't match.";
   }
 
   return errors;

@@ -6,7 +6,12 @@ import { addUser } from "../utils/userSlice";
 import { BASE_URL } from "../utils/constants";
 
 // Pages that logged-out users are allowed to see
-const PUBLIC_PATHS = ["/login", "/signup", "/forgot-password"];
+const PUBLIC_PATHS = [
+  "/login",
+  "/signup",
+  "/forgot-password",
+  "/reset-password",
+];
 
 const useFetchUser = () => {
   const dispatch = useDispatch();
