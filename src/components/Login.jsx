@@ -83,6 +83,12 @@ const Login = () => {
             {errors.password && (
               <p className="text-error">{errors.password}</p>
             )}
+            <Link
+              to="/forgot-password"
+              className="link link-primary mt-1 self-end text-sm"
+            >
+              Forgot password?
+            </Link>
           </fieldset>
 
           {serverError && (

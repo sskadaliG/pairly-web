@@ -5,6 +5,7 @@ import Body from "./components/Body";
 import Feed from "./components/Feed";
 import Login from "./components/Login";
 import Signup from "./components/Signup";
+import ForgotPassword from "./components/ForgotPassword";
 import Profile from "./components/Profile";
 import EditPassword from "./components/EditPassword";
 import Requests from "./components/Requests";
@@ -19,6 +20,7 @@ function App() {
             <Route index element={<Feed />}></Route>
             <Route path="/login" element={<Login />}></Route>
             <Route path="/signup" element={<Signup />}></Route>
+            <Route path="/forgot-password" element={<ForgotPassword />}></Route>
             <Route path="/profile" element={<Profile />}></Route>
             <Route path="/profile/password" element={<EditPassword />}></Route>
             <Route path="/requests" element={<Requests />}></Route>
