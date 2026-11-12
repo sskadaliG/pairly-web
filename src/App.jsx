@@ -11,6 +11,7 @@ import Profile from "./components/Profile";
 import EditPassword from "./components/EditPassword";
 import Requests from "./components/Requests";
 import Connections from "./components/Connections";
+import Chat from "./components/Chat";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
             <Route path="/profile/password" element={<EditPassword />}></Route>
             <Route path="/requests" element={<Requests />}></Route>
             <Route path="/connections" element={<Connections />}></Route>
+            <Route path="/chat/:userId" element={<Chat />}></Route>
           </Route>
         </Routes>
       </BrowserRouter>

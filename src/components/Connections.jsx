@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import axios from "axios";
 import UserCard from "./UserCard";
 import { addConnections } from "../utils/connectionsSlice";
@@ -50,7 +51,11 @@ const Connections = () => {
       ) : (
         <div className="flex flex-wrap justify-center gap-6">
           {connections.map((connection) => (
-            <UserCard key={connection._id} user={connection} />
+            <UserCard key={connection._id} user={connection}>
+              <Link to={"/chat/" + connection._id} className="btn btn-primary">
+                Message
+              </Link>
+            </UserCard>
           ))}
         </div>
       )}
