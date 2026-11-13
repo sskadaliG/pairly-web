@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
+import { createSocketConnection } from "../utils/socket";
 
 const Chat = () => {
   // The :userId part of the URL /chat/:userId
@@ -28,6 +29,24 @@ const Chat = () => {
 
     fetchChat();
   }, [userId]);
+
+  // Connect when the chat page opens, disconnect when it closes
+  useEffect(() => {
+    const socket = createSocketConnection();
+
+    socket.on("connect", () => {
+      console.log("Chat connected:", socket.id);
+    });
+    // Runs when the backend's io.use refuses us, e.g. "Please login again"
+    socket.on("connect_error", (err) => {
+      console.log("Chat connection refused:", err.message);
+    });
+
+    // Cleanup: React runs this when you leave the page
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
 
   if (!chat) {
     return (
