@@ -42,11 +42,23 @@ const Chat = () => {
       console.log("Chat connection refused:", err.message);
     });
 
+    // The backend sends every message I send or receive to my room, from all my chats.
+    // Only add the ones that belong to the chat on this page.
+    socket.on("newMessage", (message) => {
+      if (message.fromUserId !== userId && message.toUserId !== userId) {
+        return;
+      }
+      // Use the latest state (prev), and copy it instead of changing it
+      setChat((prev) =>
+        prev ? { ...prev, messages: [...prev.messages, message] } : prev,
+      );
+    });
+
     // Cleanup: React runs this when you leave the page
     return () => {
       socket.disconnect();
     };
-  }, []);
+  }, [userId]);
 
   if (!chat) {
     return (
