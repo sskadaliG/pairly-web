@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 
 const Chat = () => {
   // The :userId part of the URL /chat/:userId
   const { userId } = useParams();
+  // The logged-in user, to tell my messages from theirs
+  const me = useSelector((store) => store.user);
   // { user, messages } from the backend, or null while loading
   const [chat, setChat] = useState(null);
   const [error, setError] = useState("");
@@ -51,11 +54,25 @@ const Chat = () => {
       {messages.length === 0 ? (
         <p className="text-base-content/70">No messages yet. Say hi!</p>
       ) : (
-        <ul>
-          {messages.map((message) => (
-            <li key={message._id}>{message.text}</li>
-          ))}
-        </ul>
+        <div className="w-full max-w-2xl">
+          {messages.map((message) => {
+            const isMine = message.fromUserId === me?._id;
+            return (
+              <div
+                key={message._id}
+                className={"chat " + (isMine ? "chat-end" : "chat-start")}
+              >
+                <div
+                  className={
+                    "chat-bubble " + (isMine ? "chat-bubble-primary" : "")
+                  }
+                >
+                  {message.text}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );
