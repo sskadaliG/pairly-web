@@ -116,51 +116,60 @@ const Chat = () => {
         {user.firstName + " " + user.lastName}
       </h1>
 
-      {messages.length === 0 ? (
-        <p className="text-base-content/70">No messages yet. Say hi!</p>
-      ) : (
-        <div className="w-full max-w-2xl">
-          {messages.map((message) => {
-            const isMine = message.fromUserId === me?._id;
-            return (
-              <div
-                key={message._id}
-                className={"chat " + (isMine ? "chat-end" : "chat-start")}
-              >
-                <div
-                  className={
-                    "chat-bubble " + (isMine ? "chat-bubble-primary" : "")
-                  }
-                >
-                  {message.text}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-
-      <form onSubmit={sendMessage} className="flex w-full max-w-2xl gap-2">
-        <input
-          type="text"
-          className="input flex-1"
-          placeholder="Type a message"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          maxLength={1000}
-        />
-        <button
-          type="submit"
-          className="btn btn-primary"
-          disabled={sending || !text.trim()}
-        >
-          {sending ? (
-            <span className="loading loading-spinner loading-sm"></span>
+      {/* The chat window: a fixed height, so only the messages scroll */}
+      <div className="flex h-[70vh] w-full max-w-2xl flex-col rounded-box bg-base-100 shadow-md">
+        {/* flex-1 takes all the height the form doesn't use; overflow-y-auto adds a scrollbar when needed */}
+        <div className="flex-1 overflow-y-auto p-4">
+          {messages.length === 0 ? (
+            <p className="text-center text-base-content/70">
+              No messages yet. Say hi!
+            </p>
           ) : (
-            "Send"
+            messages.map((message) => {
+              const isMine = message.fromUserId === me?._id;
+              return (
+                <div
+                  key={message._id}
+                  className={"chat " + (isMine ? "chat-end" : "chat-start")}
+                >
+                  <div
+                    className={
+                      "chat-bubble " + (isMine ? "chat-bubble-primary" : "")
+                    }
+                  >
+                    {message.text}
+                  </div>
+                </div>
+              );
+            })
           )}
-        </button>
-      </form>
+        </div>
+
+        <form
+          onSubmit={sendMessage}
+          className="flex gap-2 border-t border-base-300 p-3"
+        >
+          <input
+            type="text"
+            className="input flex-1"
+            placeholder="Type a message"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            maxLength={1000}
+          />
+          <button
+            type="submit"
+            className="btn btn-primary"
+            disabled={sending || !text.trim()}
+          >
+            {sending ? (
+              <span className="loading loading-spinner loading-sm"></span>
+            ) : (
+              "Send"
+            )}
+          </button>
+        </form>
+      </div>
 
       {sendError && (
         <div role="alert" className="alert alert-error w-full max-w-2xl">
