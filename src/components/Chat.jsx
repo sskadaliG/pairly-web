@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
@@ -13,6 +13,12 @@ const Chat = () => {
   // { user, messages } from the backend, or null while loading
   const [chat, setChat] = useState(null);
   const [error, setError] = useState("");
+  // What's typed in the message box
+  const [text, setText] = useState("");
+  const [sending, setSending] = useState(false);
+  const [sendError, setSendError] = useState("");
+  // Keeps the socket between renders, so sendMessage can use the one the effect opened
+  const socketRef = useRef(null);
 
   useEffect(() => {
     const fetchChat = async () => {
@@ -33,6 +39,7 @@ const Chat = () => {
   // Connect when the chat page opens, disconnect when it closes
   useEffect(() => {
     const socket = createSocketConnection();
+    socketRef.current = socket;
 
     socket.on("connect", () => {
       console.log("Chat connected:", socket.id);
@@ -57,8 +64,35 @@ const Chat = () => {
     // Cleanup: React runs this when you leave the page
     return () => {
       socket.disconnect();
+      socketRef.current = null;
     };
   }, [userId]);
+
+  const sendMessage = (e) => {
+    e.preventDefault();
+    const socket = socketRef.current;
+    if (!text.trim() || !socket) {
+      return;
+    }
+
+    setSending(true);
+    setSendError("");
+    // The last argument is the callback: the backend's reply({ ok, error }) runs it.
+    // timeout gives up after 5 seconds, e.g. if the connection dropped.
+    socket
+      .timeout(5000)
+      .emit("sendMessage", { toUserId: userId, text }, (err, reply) => {
+        setSending(false);
+        if (err) {
+          setSendError("Couldn't reach the server. Please try again.");
+        } else if (reply.ok) {
+          // The message itself arrives through newMessage, so just clear the box
+          setText("");
+        } else {
+          setSendError(reply.error);
+        }
+      });
+  };
 
   if (!chat) {
     return (
@@ -103,6 +137,34 @@ const Chat = () => {
               </div>
             );
           })}
+        </div>
+      )}
+
+      <form onSubmit={sendMessage} className="flex w-full max-w-2xl gap-2">
+        <input
+          type="text"
+          className="input flex-1"
+          placeholder="Type a message"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          maxLength={1000}
+        />
+        <button
+          type="submit"
+          className="btn btn-primary"
+          disabled={sending || !text.trim()}
+        >
+          {sending ? (
+            <span className="loading loading-spinner loading-sm"></span>
+          ) : (
+            "Send"
+          )}
+        </button>
+      </form>
+
+      {sendError && (
+        <div role="alert" className="alert alert-error w-full max-w-2xl">
+          <span>{sendError}</span>
         </div>
       )}
     </div>
