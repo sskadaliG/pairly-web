@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { createSocketConnection } from "../utils/socket";
+import { hasPhoto, getInitial } from "../utils/photo";
 
 // "2026-11-17T10:42:00.000Z" -> "10:42 AM", in the viewer's own time zone and style
 const formatTime = (date) =>
@@ -131,12 +132,35 @@ const Chat = () => {
 
   return (
     <div className="flex flex-1 flex-col items-center gap-6 p-6">
-      <h1 className="text-2xl font-semibold">
-        {user.firstName + " " + user.lastName}
-      </h1>
-
       {/* The chat window: a fixed height, so only the messages scroll */}
       <div className="flex h-[70vh] w-full max-w-2xl flex-col rounded-box bg-base-100 shadow-md">
+        {/* Header: back to connections, then who you're chatting with */}
+        <div className="flex items-center gap-3 border-b border-base-300 p-3">
+          <Link
+            to="/connections"
+            className="btn btn-circle btn-ghost btn-sm"
+            aria-label="Back to connections"
+          >
+            ←
+          </Link>
+          {hasPhoto(user.photoURL) ? (
+            <div className="avatar">
+              <div className="w-10 rounded-full">
+                <img alt={user.firstName} src={user.photoURL} />
+              </div>
+            </div>
+          ) : (
+            <div className="avatar avatar-placeholder">
+              <div className="w-10 rounded-full bg-primary text-primary-content">
+                <span className="text-lg">{getInitial(user.firstName)}</span>
+              </div>
+            </div>
+          )}
+          <h1 className="text-lg font-semibold">
+            {user.firstName + " " + user.lastName}
+          </h1>
+        </div>
+
         {/* flex-1 takes all the height the form doesn't use; overflow-y-auto adds a scrollbar when needed */}
         <div ref={messagesRef} className="flex-1 overflow-y-auto p-4">
           {messages.length === 0 ? (
