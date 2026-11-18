@@ -19,6 +19,8 @@ const Chat = () => {
   const [sendError, setSendError] = useState("");
   // Keeps the socket between renders, so sendMessage can use the one the effect opened
   const socketRef = useRef(null);
+  // Points at the scrolling messages area on the page, so we can scroll it
+  const messagesRef = useRef(null);
 
   useEffect(() => {
     const fetchChat = async () => {
@@ -68,6 +70,16 @@ const Chat = () => {
     };
   }, [userId]);
 
+  // Scroll to the newest message when the chat loads and whenever one arrives
+  const messages = chat?.messages;
+  useEffect(() => {
+    const box = messagesRef.current;
+    if (box) {
+      // scrollHeight is the full height of everything inside, so this scrolls to the very bottom
+      box.scrollTop = box.scrollHeight;
+    }
+  }, [messages]);
+
   const sendMessage = (e) => {
     e.preventDefault();
     const socket = socketRef.current;
@@ -108,7 +120,7 @@ const Chat = () => {
     );
   }
 
-  const { user, messages } = chat;
+  const { user } = chat;
 
   return (
     <div className="flex flex-1 flex-col items-center gap-6 p-6">
@@ -119,7 +131,7 @@ const Chat = () => {
       {/* The chat window: a fixed height, so only the messages scroll */}
       <div className="flex h-[70vh] w-full max-w-2xl flex-col rounded-box bg-base-100 shadow-md">
         {/* flex-1 takes all the height the form doesn't use; overflow-y-auto adds a scrollbar when needed */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div ref={messagesRef} className="flex-1 overflow-y-auto p-4">
           {messages.length === 0 ? (
             <p className="text-center text-base-content/70">
               No messages yet. Say hi!
