@@ -5,6 +5,13 @@ import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 import { createSocketConnection } from "../utils/socket";
 
+// "2026-11-17T10:42:00.000Z" -> "10:42 AM", in the viewer's own time zone and style
+const formatTime = (date) =>
+  new Date(date).toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
 const Chat = () => {
   // The :userId part of the URL /chat/:userId
   const { userId } = useParams();
@@ -150,6 +157,11 @@ const Chat = () => {
                     }
                   >
                     {message.text}
+                  </div>
+                  <div className="chat-footer opacity-50">
+                    <time dateTime={message.createdAt}>
+                      {formatTime(message.createdAt)}
+                    </time>
                   </div>
                 </div>
               );
