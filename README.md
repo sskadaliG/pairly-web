@@ -1,6 +1,6 @@
 # pairly-web
 
-The frontend for **Pairly**, a Tinder-inspired app for meeting people. Swipe through a feed of people, send interest, accept or reject requests, and see your connections.
+The frontend for **Pairly**, a Tinder-inspired app for meeting people. Swipe through a feed of people, send interest, accept or reject requests, see your connections, and chat with them live.
 
 The backend (an Express + MongoDB REST API) lives in a separate `Pairly` project.
 
@@ -14,6 +14,7 @@ The backend (an Express + MongoDB REST API) lives in a separate `Pairly` project
 - [Redux Toolkit](https://redux-toolkit.js.org) and React Redux for app state
 - [Axios](https://axios-http.com) for API calls
 - [Motion](https://motion.dev) for the swipe animations
+- [Socket.IO client](https://socket.io/docs/v4/client-api/) for live chat
 - ESLint for linting
 
 ## Getting started
@@ -27,16 +28,16 @@ npm run dev
 
 The app runs at http://localhost:5173.
 
-The backend must allow CORS from `http://localhost:5173` with `credentials: true`, because login uses an httpOnly cookie. The API address is set in `src/utils/constants.js` (`BASE_URL`).
+The backend must allow CORS from `http://localhost:5173` with `credentials: true`, because login uses an httpOnly cookie. This applies to both the REST API and the Socket.IO server. The API address is set in `src/utils/constants.js` (`BASE_URL`), and chat connects to the same address.
 
 ## Scripts
 
-| Command           | Description                                 |
-| ----------------- | ------------------------------------------- |
-| `npm run dev`     | Start the dev server with hot reload        |
-| `npm run build`   | Build for production into `dist/`           |
-| `npm run preview` | Serve the production build locally          |
-| `npm run lint`    | Run ESLint                                  |
+| Command           | Description                          |
+| ----------------- | ------------------------------------ |
+| `npm run dev`     | Start the dev server with hot reload |
+| `npm run build`   | Build for production into `dist/`    |
+| `npm run preview` | Serve the production build locally   |
+| `npm run lint`    | Run ESLint                           |
 
 ## Features
 
@@ -50,7 +51,13 @@ The backend must allow CORS from `http://localhost:5173` with `credentials: true
   - The Ignore and Interested buttons fly the card off the same way.
   - The next person waits underneath and moves forward after each swipe. A new batch loads when the feed runs out.
 - **Connection requests** from people interested in you, with Accept and Reject buttons.
-- **Connections** list of people you've matched with.
+- **Connections** list of people you've matched with, each with a Message button.
+- **Chat** with your connections, live:
+  - Opens with the latest 100 messages, then new messages appear instantly without refreshing, in every tab you have open.
+  - Your messages are on the right in the brand color, theirs on the left, each with the time it was sent.
+  - The messages scroll inside a fixed-height window and jump to the newest one.
+  - A header shows the person's photo or initial and a back link to Connections.
+  - Sending shows an error if the message is refused (for example, you're not connected) or the server can't be reached within 5 seconds.
 - **Edit profile** with a live preview of your card.
 - **Change password** with a confirmation check.
 - **Initial avatars**: people without a photo get the first letter of their name.
@@ -76,7 +83,8 @@ src/
 │   ├── SwipeCard.jsx         # Draggable card with tilt, labels and Ignore / Interested
 │   ├── UserCard.jsx          # Reusable person card; buttons passed as children
 │   ├── Requests.jsx          # Received requests with Accept / Reject
-│   ├── Connections.jsx       # Your connections
+│   ├── Connections.jsx       # Your connections, with a Message button
+│   ├── Chat.jsx              # Chat history, live messages and the message box
 │   ├── Profile.jsx           # Loads the user, welcome banner for new users
 │   ├── EditProfile.jsx       # Profile form with live card preview
 │   └── EditPassword.jsx      # Change password form
@@ -86,6 +94,7 @@ src/
 └── utils/
     ├── constants.js          # BASE_URL and the backend's default photo URL
     ├── photo.js              # hasPhoto and getInitial helpers
+    ├── socket.js             # Opens the Socket.IO connection with the login cookie
     ├── validation.js         # Form validation for login, signup, forgot and reset password
     ├── appStore.js           # Redux store
     ├── userSlice.js          # Logged-in user
@@ -98,37 +107,50 @@ src/
 
 All pages render inside the `Body` layout, so the navbar and footer appear on every page.
 
-| Path                | Page                     |
-| ------------------- | ------------------------ |
-| `/`                 | Home (feed)              |
-| `/login`            | Login                    |
-| `/signup`           | Sign up                  |
-| `/forgot-password`  | Forgot password          |
+| Path                | Page                                           |
+| ------------------- | ---------------------------------------------- |
+| `/`                 | Home (feed)                                    |
+| `/login`            | Login                                          |
+| `/signup`           | Sign up                                        |
+| `/forgot-password`  | Forgot password                                |
 | `/reset-password`   | Reset password (`?token=` from the reset link) |
-| `/profile`          | Edit profile             |
-| `/profile/password` | Change password          |
-| `/requests`         | Connection requests      |
-| `/connections`      | Connections              |
+| `/profile`          | Edit profile                                   |
+| `/profile/password` | Change password                                |
+| `/requests`         | Connection requests                            |
+| `/connections`      | Connections                                    |
+| `/chat/:userId`     | Chat with a connection                         |
 
 ## Backend API used
 
-| Method | Endpoint                               | Used for                    |
-| ------ | -------------------------------------- | --------------------------- |
-| POST   | `/signup`                              | Create an account           |
-| POST   | `/login`                               | Log in (also after signup)  |
-| POST   | `/logout`                              | Log out                     |
-| POST   | `/forgot-password`                     | Request a reset link        |
-| POST   | `/reset-password`                      | Set a new password          |
-| GET    | `/profile/view`                        | Load the logged-in user     |
-| PATCH  | `/profile/edit`                        | Save profile                |
-| PATCH  | `/profile/password`                    | Change password             |
-| GET    | `/feed`                                | Feed users                  |
-| POST   | `/request/send/:status/:userId`        | Ignore or Interested        |
-| GET    | `/user/requests/received`              | Received requests           |
-| POST   | `/request/review/:status/:requestId`   | Accept or Reject            |
-| GET    | `/user/connections`                    | Connections                 |
+| Method | Endpoint                             | Used for                        |
+| ------ | ------------------------------------ | ------------------------------- |
+| POST   | `/signup`                            | Create an account               |
+| POST   | `/login`                             | Log in (also after signup)      |
+| POST   | `/logout`                            | Log out                         |
+| POST   | `/forgot-password`                   | Request a reset link            |
+| POST   | `/reset-password`                    | Set a new password              |
+| GET    | `/profile/view`                      | Load the logged-in user         |
+| PATCH  | `/profile/edit`                      | Save profile                    |
+| PATCH  | `/profile/password`                  | Change password                 |
+| GET    | `/feed`                              | Feed users                      |
+| POST   | `/request/send/:status/:userId`      | Ignore or Interested            |
+| GET    | `/user/requests/received`            | Received requests               |
+| POST   | `/request/review/:status/:requestId` | Accept or Reject                |
+| GET    | `/user/connections`                  | Connections                     |
+| GET    | `/chat/:userId`                      | Chat history (connections only) |
 
 All requests send the auth cookie with `withCredentials: true`.
+
+## Live chat (Socket.IO)
+
+The chat page opens a Socket.IO connection to the backend when it loads and closes it when you leave. The backend checks the login cookie before accepting the connection, and puts each user in a room named after their user ID.
+
+| Direction         | Event         | Data                 | Used for                                                                          |
+| ----------------- | ------------- | -------------------- | --------------------------------------------------------------------------------- |
+| Browser → backend | `sendMessage` | `{ toUserId, text }` | Send a message. The backend replies `{ ok: true }` or `{ ok: false, error }`.     |
+| Backend → browser | `newMessage`  | The saved message    | A message you sent or received. The chat page adds it if it belongs to this chat. |
+
+Messages are saved before they are delivered, and only connections can message each other.
 
 ## Styling
 
@@ -139,6 +161,6 @@ All requests send the auth cookie with `withCredentials: true`.
 
 ## Next steps
 
-- Chat with connections
+- Show unread messages and the latest message on the Connections page
 - Send password reset links by email (the backend only logs them for now)
 - Deployment
